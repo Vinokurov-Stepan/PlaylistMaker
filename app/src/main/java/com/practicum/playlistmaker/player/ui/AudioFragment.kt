@@ -18,7 +18,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.core.domain.models.Playlist
 import com.practicum.playlistmaker.core.domain.models.Track
-import com.practicum.playlistmaker.core.ui.App
 import com.practicum.playlistmaker.core.ui.root.RootActivity
 import com.practicum.playlistmaker.core.util.debounce
 import com.practicum.playlistmaker.databinding.FragmentAudioBinding
@@ -32,7 +31,6 @@ class AudioFragment : Fragment() {
 
     private var _binding: FragmentAudioBinding? = null
     private val binding get() = _binding!!
-    private var darkTheme: Boolean = false
     private var track: Track? = null
     private var state = -1
     private var isTrackLicked = false
@@ -44,7 +42,6 @@ class AudioFragment : Fragment() {
     private var toastText: String? = null
     private lateinit var trackAddMessage: String
     private lateinit var trackAddedMessage: String
-    private var shouldHideBottomSheet = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,8 +59,6 @@ class AudioFragment : Fragment() {
         trackAddedMessage = getString(R.string.trackAdded)
 
         viewModel = getViewModel { parametersOf(trackAddMessage, trackAddedMessage) }
-
-        darkTheme = (requireContext().applicationContext as App).getAppTheme()
 
         onPlaylistClickDebounce = debounce<Playlist>(
             CLICK_DEBOUNCE_DELAY, viewLifecycleOwner.lifecycleScope, false
@@ -159,6 +154,7 @@ class AudioFragment : Fragment() {
             binding.trackTimeToEnd.text = it.timer
             binding.playTrackButton.isEnabled = it.isPlayButtonEnabled
             if (isTrackLicked != it.isTrackLicked) {
+                binding.toLikeTrackButton.setLickedState(isTrackLicked)
                 changeLickedButtonStyle(it.isTrackLicked)
                 isTrackLicked = it.isTrackLicked
             }
@@ -223,6 +219,8 @@ class AudioFragment : Fragment() {
         track = null
         state = -1
         isTrackLicked = false
+        binding.playTrackButton.cleanup()
+        binding.toLikeTrackButton.cleanup()
         _binding = null
     }
 
@@ -243,26 +241,18 @@ class AudioFragment : Fragment() {
     }
 
     private fun changePlayButtonStyle() {
-        if (darkTheme) {
-            binding.playTrackButton.setImageResource(R.drawable.to_play_track_dark)
-        } else {
-            binding.playTrackButton.setImageResource(R.drawable.to_play_track)
-        }
+        binding.playTrackButton.setIcon(false)
     }
 
     private fun changePauseButtonStyle() {
-        if (darkTheme) {
-            binding.playTrackButton.setImageResource(R.drawable.to_stop_track_dark)
-        } else {
-            binding.playTrackButton.setImageResource(R.drawable.to_stop_track)
-        }
+        binding.playTrackButton.setIcon(true)
     }
 
     private fun changeLickedButtonStyle(isTrackLicked: Boolean) {
         if (isTrackLicked) {
-            binding.toLikeTrackButton.setImageResource(R.drawable.track_licked_icon)
+            binding.toLikeTrackButton.setIcon(true)
         } else {
-            binding.toLikeTrackButton.setImageResource(R.drawable.to_like_track_icon)
+            binding.toLikeTrackButton.setIcon(false)
         }
     }
 

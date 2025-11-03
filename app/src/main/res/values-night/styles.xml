@@ -125,11 +125,6 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
-    <style name="PlayTrackButton">
-        <item name="android:background">@drawable/play_track_button_dark</item>
-        <item name="android:src">@drawable/to_play_track_dark</item>
-    </style>
-
     <style name="FunctionTrackButton">
         <item name="android:layout_width">51dp</item>
         <item name="android:layout_height">51dp</item>

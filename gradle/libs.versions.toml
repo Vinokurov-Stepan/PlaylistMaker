@@ -21,8 +21,10 @@ agp = "8.11.1"
 kotlin = "2.2.10"
 room_version = "2.7.2"
 peko = "3.0.5"
+firebase-bom = "34.4.0"
 
 [libraries]
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
 peko = { group = "com.markodevcic", name = "peko", version.ref = "peko" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room_version" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room_version" }

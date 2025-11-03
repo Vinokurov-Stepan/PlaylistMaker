@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.MediaPlayer
 import androidx.room.Room
 import com.google.gson.Gson
+import com.practicum.playlistmaker.BuildConfig
 import com.practicum.playlistmaker.media.data.AppDatabase
 import com.practicum.playlistmaker.media.data.dao.AddedTrackDao
 import com.practicum.playlistmaker.media.data.dao.PlaylistDao
@@ -18,8 +19,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 val dataModule = module {
     single<ITunesAPI> {
-        val iTunesBaseUrl = "https://itunes.apple.com"
-        val retrofit = Retrofit.Builder().baseUrl(iTunesBaseUrl)
+        val retrofit = Retrofit.Builder().baseUrl(BuildConfig.SERVER_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create()).build()
         retrofit.create(ITunesAPI::class.java)
     }
