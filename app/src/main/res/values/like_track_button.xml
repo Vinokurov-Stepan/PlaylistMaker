@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="LikeTrackButtonView">
+        <attr name="trackNotLickedIcon" format="reference" />
+        <attr name="trackLickedIcon" format="reference" />
+        <attr name="backgroundDark" format="reference" />
+        <attr name="backgroundDay" format="reference" />
+    </declare-styleable>
+</resources>

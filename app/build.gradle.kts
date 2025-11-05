@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("kotlin-kapt")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -19,16 +20,23 @@ android {
     }
 
     buildFeatures {
+        buildConfig = true
         viewBinding = true
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
+            buildConfigField("String", "SERVER_BASE_URL", "\"https://itunes.apple.com/\"")
+            signingConfig = signingConfigs.getByName("debug")
+        }
+
+        debug {
+            isMinifyEnabled = false
+            buildConfigField("String", "SERVER_BASE_URL", "\"https://itunes.apple.com/\"")
         }
     }
 
@@ -48,6 +56,7 @@ dependencies {
         kapt(libs.moxy.compiler)
         kapt(libs.room.compiler)
 
+        implementation(platform(libs.firebase.bom))
         implementation(libs.peko)
         implementation(libs.room.runtime)
         implementation(libs.room.ktx)

@@ -84,15 +84,18 @@
                 app:layout_constraintStart_toStartOf="@+id/leftGL"
                 app:layout_constraintTop_toBottomOf="@+id/trackName" />
 
-            <ImageButton
+            <com.practicum.playlistmaker.player.ui.PlaybackButtonView
                 android:id="@+id/playTrackButton"
-                style="@style/PlayTrackButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="84dp"
+                android:layout_height="84dp"
                 android:layout_marginTop="30dp"
                 app:layout_constraintEnd_toStartOf="@id/rightGL"
                 app:layout_constraintStart_toStartOf="@id/leftGL"
-                app:layout_constraintTop_toBottomOf="@id/artistName" />
+                app:layout_constraintTop_toBottomOf="@id/artistName"
+                app:pauseIcon="@drawable/to_stop_track"
+                app:pauseIconDark="@drawable/to_stop_track_dark"
+                app:playIcon="@drawable/to_play_track"
+                app:playIconDark="@drawable/to_play_track_dark" />
 
             <ImageButton
                 android:id="@+id/addToPlaylistButton"
@@ -102,13 +105,17 @@
                 app:layout_constraintStart_toStartOf="@id/leftGL"
                 app:layout_constraintTop_toTopOf="@id/playTrackButton" />
 
-            <ImageButton
+            <com.practicum.playlistmaker.player.ui.LikeTrackButtonView
                 android:id="@+id/toLikeTrackButton"
-                style="@style/FunctionTrackButton"
-                android:src="@drawable/to_like_track_icon"
+                android:layout_width="51dp"
+                android:layout_height="51dp"
+                app:backgroundDark="@drawable/function_button_dark"
+                app:backgroundDay="@drawable/function_button"
                 app:layout_constraintBottom_toBottomOf="@id/playTrackButton"
                 app:layout_constraintEnd_toStartOf="@id/rightGL"
-                app:layout_constraintTop_toTopOf="@id/playTrackButton" />
+                app:layout_constraintTop_toTopOf="@id/playTrackButton"
+                app:trackLickedIcon="@drawable/track_licked_icon"
+                app:trackNotLickedIcon="@drawable/to_like_track_icon" />
 
             <TextView
                 android:id="@+id/trackTimeToEnd"
