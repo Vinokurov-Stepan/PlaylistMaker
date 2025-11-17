@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.search.ui
 
 import android.content.Context
+import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
@@ -9,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -17,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.core.domain.models.Track
 import com.practicum.playlistmaker.core.ui.root.RootActivity
+import com.practicum.playlistmaker.core.util.NetworkStateBroadcastReceiver
 import com.practicum.playlistmaker.core.util.debounce
 import com.practicum.playlistmaker.databinding.FragmentSearchBinding
 import com.practicum.playlistmaker.search.presentation.TracksState
@@ -26,6 +29,7 @@ import org.koin.core.parameter.parametersOf
 
 class SearchFragment : Fragment() {
 
+    private val networkStateBroadcastReceiver = NetworkStateBroadcastReceiver()
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
     private lateinit var errorMessage: String
@@ -240,6 +244,21 @@ class SearchFragment : Fragment() {
         val manager =
             requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         manager.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ContextCompat.registerReceiver(
+            requireContext(),
+            networkStateBroadcastReceiver,
+            IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"),
+            ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
+    }
+
+    override fun onPause() {
+        super.onPause()
+        requireContext().unregisterReceiver(networkStateBroadcastReceiver)
     }
 
     override fun onDestroyView() {
