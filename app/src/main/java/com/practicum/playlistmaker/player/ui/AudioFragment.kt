@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.player.ui
 
+import android.Manifest
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -13,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -65,6 +67,17 @@ class AudioFragment : Fragment() {
         }
     }
 
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            bindMusicService()
+        } else {
+            Toast.makeText(requireContext(), R.string.foreground_service_error, Toast.LENGTH_LONG)
+                .show()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -89,7 +102,11 @@ class AudioFragment : Fragment() {
         }
 
         setupObservers()
-        bindMusicService()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            bindMusicService()
+        }
         setupViews()
     }
 
@@ -270,11 +287,7 @@ class AudioFragment : Fragment() {
         val stopIntent = Intent(requireContext(), MusicService::class.java)
         requireContext().stopService(stopIntent)
         val intent = Intent(requireContext(), MusicService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ContextCompat.startForegroundService(requireContext(), intent)
-        } else {
-            requireContext().startService(intent)
-        }
+        ContextCompat.startForegroundService(requireContext(), intent)
         requireContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
 

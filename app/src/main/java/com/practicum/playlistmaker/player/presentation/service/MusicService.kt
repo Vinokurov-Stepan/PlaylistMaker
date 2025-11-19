@@ -21,6 +21,7 @@ import com.practicum.playlistmaker.search.domain.api.SearchHistoryInteractor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,11 +37,12 @@ class MusicService() : Service(), AudioPlayerControl {
     private val playlistsInteractor: PlaylistsInteractor by inject()
 
     private val binder = MusicServiceBinder()
-    private var timerJob: Job? = null
+    private var musicServiceJob: Job? = null
     private var track: Track? = null
     private var isPlayerInitialized = false
     private var isAppInBackground = false
     private var isOnAudioScreen = true
+    private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     private val _servicePlayerState = MutableStateFlow<PlayerState>(PlayerState.Default())
     private val servicePlayerState = _servicePlayerState.asStateFlow()
@@ -52,33 +54,19 @@ class MusicService() : Service(), AudioPlayerControl {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        val initialNotification = createInitialNotification()
-        ServiceCompat.startForeground(
-            this, SERVICE_NOTIFICATION_ID, initialNotification, getForegroundServiceTypeConstant()
-        )
         track = searchHistory.getListeningTrack()
         preparePlayer()
-    }
-
-    private fun createInitialNotification(): Notification {
-        return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setContentTitle(getString(R.string.app_name))
-            .setContentText(getString(R.string.app_name))
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE).setSilent(true).build()
+        showNotification()
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                NOTIFICATION_CHANNEL_ID, LOG_TAG, NotificationManager.IMPORTANCE_LOW
+            )
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
         }
-        val channel = NotificationChannel(
-            NOTIFICATION_CHANNEL_ID, LOG_TAG, NotificationManager.IMPORTANCE_DEFAULT
-        )
-        channel.description = "Service for playing music"
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
     }
 
     private fun getForegroundServiceTypeConstant(): Int {
@@ -102,7 +90,7 @@ class MusicService() : Service(), AudioPlayerControl {
             )
         }
         player.getMediaPlayer().setOnCompletionListener {
-            timerJob?.cancel()
+            musicServiceJob?.cancel()
             _servicePlayerState.value = PlayerState.Prepared(
                 track = track,
                 timer = player.resetTimer(),
@@ -115,7 +103,7 @@ class MusicService() : Service(), AudioPlayerControl {
     }
 
     private fun checkIfTrackIsFavorite(currentTrack: Track?) {
-        timerJob = CoroutineScope(Dispatchers.Main).launch {
+        musicServiceJob = serviceScope.launch {
             val favoriteTracks = player.getIdTracks()
             val isFavorite = favoriteTracks.contains(currentTrack!!.trackId)
             _servicePlayerState.value = _servicePlayerState.value.updateFavoriteState(isFavorite)
@@ -137,7 +125,7 @@ class MusicService() : Service(), AudioPlayerControl {
 
     override fun pausePlayer() {
         player.pause()
-        timerJob?.cancel()
+        musicServiceJob?.cancel()
         _servicePlayerState.value = PlayerState.Paused(
             track = track,
             timer = player.getCurrentPosition(),
@@ -148,26 +136,24 @@ class MusicService() : Service(), AudioPlayerControl {
 
     private fun showNotification() {
         val notification = createMusicNotification()
-        val notificationManager = getSystemService(NotificationManager::class.java)
-        notificationManager.notify(SERVICE_NOTIFICATION_ID, notification)
+        ServiceCompat.startForeground(
+            this, SERVICE_NOTIFICATION_ID, notification, getForegroundServiceTypeConstant()
+        )
     }
 
     private fun createMusicNotification(): Notification {
-        val trackName = track?.trackName
         val artistName = track?.artistName
+        val trackName = track?.trackName
         return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setContentTitle(getString(R.string.app_name))
-            .setContentText("$artistName - $trackName")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE).setOngoing(true).setSilent(true)
-            .build()
+            .setContentTitle(getString(R.string.app_name)).setContentText(
+                getString(R.string.foreground_service_info, artistName, trackName)
+            ).setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE).build()
     }
 
     private fun hideNotification() {
-        val initialNotification = createInitialNotification()
-        val notificationManager = getSystemService(NotificationManager::class.java)
-        notificationManager.notify(SERVICE_NOTIFICATION_ID, initialNotification)
+        stopForeground(true)
     }
 
     override fun safeReleasePlayer() {
@@ -177,7 +163,7 @@ class MusicService() : Service(), AudioPlayerControl {
         player.release()
         isPlayerInitialized = false
         _servicePlayerState.value = PlayerState.Default(timer = player.resetTimer())
-        timerJob?.cancel()
+        musicServiceJob?.cancel()
         hideNotification()
         stopSelf()
     }
@@ -198,8 +184,8 @@ class MusicService() : Service(), AudioPlayerControl {
     }
 
     private fun startTimerUpdate() {
-        timerJob?.cancel()
-        timerJob = CoroutineScope(Dispatchers.Main).launch {
+        musicServiceJob?.cancel()
+        musicServiceJob = serviceScope.launch {
             while (_servicePlayerState.value is PlayerState.Playing) {
                 delay(REFRESH_SECONDS_VALUE_MILLIS)
                 val currentState = _servicePlayerState.value
@@ -212,7 +198,7 @@ class MusicService() : Service(), AudioPlayerControl {
     }
 
     override fun onFavouriteClicked() {
-        timerJob = CoroutineScope(Dispatchers.Main).launch {
+        musicServiceJob = serviceScope.launch {
             val currentState = _servicePlayerState.value
             if (currentState.isTrackLicked) {
                 favouritesInteractor.deleteTrack(track!!)
@@ -245,7 +231,7 @@ class MusicService() : Service(), AudioPlayerControl {
     override fun onDestroy() {
         super.onDestroy()
         safeReleasePlayer()
-        timerJob?.cancel()
+        musicServiceJob?.cancel()
     }
 
     companion object {
