@@ -4,6 +4,7 @@ import com.practicum.playlistmaker.core.domain.models.Track
 import com.practicum.playlistmaker.media.domain.api.FavouritesInteractor
 import com.practicum.playlistmaker.media.domain.api.FavouritesRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 
 class FavouritesInteractorImpl(private val favouritesRepository: FavouritesRepository) :
     FavouritesInteractor {
@@ -18,5 +19,9 @@ class FavouritesInteractorImpl(private val favouritesRepository: FavouritesRepos
 
     override fun getTracks(): Flow<List<Track>> {
         return favouritesRepository.getTracks()
+    }
+
+    override suspend fun getFirstFavoriteTrack(): List<Track> {
+        return favouritesRepository.getTracks().first()
     }
 }

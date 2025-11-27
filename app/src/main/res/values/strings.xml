@@ -51,6 +51,9 @@
     <string name="to_redact">Редактировать</string>
     <string name="to_save">Сохранить</string>
     <string name="empty_playlist_placeholder">В этом плейлисте\nнет ни одного трека</string>
+    <string name="network_disconnect">Отсутствует подключение к интернету</string>
+    <string name="foreground_service_info">%1$s - %2$s</string>
+    <string name="foreground_service_error">Ошибка запуска foreground service!</string>
     <plurals name="tracks_count">
         <item quantity="one">%d трек</item>
         <item quantity="few">%d трека</item>

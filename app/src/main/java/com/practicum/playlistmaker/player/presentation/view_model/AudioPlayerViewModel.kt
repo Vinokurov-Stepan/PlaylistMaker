@@ -5,169 +5,65 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.core.domain.models.Playlist
-import com.practicum.playlistmaker.core.domain.models.Track
-import com.practicum.playlistmaker.media.domain.api.FavouritesInteractor
 import com.practicum.playlistmaker.media.domain.api.PlaylistsInteractor
 import com.practicum.playlistmaker.media.presentation.PlaylistsState
-import com.practicum.playlistmaker.player.domain.api.PlayerInteractor
-import com.practicum.playlistmaker.player.presentation.PlayerState
-import com.practicum.playlistmaker.search.domain.api.SearchHistoryInteractor
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import com.practicum.playlistmaker.player.presentation.service.AudioPlayerControl
+import com.practicum.playlistmaker.player.presentation.service.PlayerState
 import kotlinx.coroutines.launch
 
 class AudioPlayerViewModel(
-    private val player: PlayerInteractor,
-    private val searchHistory: SearchHistoryInteractor,
-    private val favouritesInteractor: FavouritesInteractor,
     private val playlistsInteractor: PlaylistsInteractor,
     private val trackAddMessage: String,
     private val trackAddedMessage: String
 ) : ViewModel() {
 
-    companion object {
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
-        private const val REFRESH_SECONDS_VALUE_MILLIS = 300L
-    }
+    private var audioPlayerControl: AudioPlayerControl? = null
 
-    private var timerJob: Job? = null
-    private lateinit var track: Track
-    private var isPlayerInitialized = false
+    private val playerState = MutableLiveData<PlayerState>(PlayerState.Default())
+    fun observePlayerState(): LiveData<PlayerState> = playerState
 
-    init {
+    fun setAudioPlayerControl(audioPlayerControl: AudioPlayerControl) {
+        this.audioPlayerControl = audioPlayerControl
         viewModelScope.launch {
-            initializePlayer()
-        }
-    }
-
-    fun initialize() {
-        if (!isPlayerInitialized) {
-            viewModelScope.launch {
-                initializePlayer()
+            audioPlayerControl.getPlayerState().collect {
+                playerState.postValue(it)
             }
         }
     }
-
-    private suspend fun initializePlayer() {
-        val listeningTrack = searchHistory.getListeningTrack()
-        if (listeningTrack != null) {
-            track = listeningTrack
-            preparePlayer()
-        }
-    }
-
-    private val state = MutableLiveData(
-        PlayerState(
-            track = track,
-            state = STATE_DEFAULT,
-            timer = player.resetTimer(),
-            isPlayButtonEnabled = false,
-            isTrackLicked = false,
-            addedTrackState = false,
-            message = null,
-            shouldHideBottomSheet = false
-        )
-    )
-
-    fun getState(): LiveData<PlayerState?> = state
 
     fun onFavouriteClicked() {
-        viewModelScope.launch {
-            if (state.value?.isTrackLicked == true) {
-                favouritesInteractor.deleteTrack(track)
-                changeLickedButtonStyle(false)
-            } else {
-                favouritesInteractor.addTrack(track)
-                changeLickedButtonStyle(true)
-            }
-        }
+        audioPlayerControl?.onFavouriteClicked()
     }
 
-    private suspend fun checkIfTrackIsFavorite() {
-        val favoriteTracks = player.getIdTracks()
-        val isFavorite = favoriteTracks.contains(track.trackId)
-        state.value = state.value?.copy(isTrackLicked = isFavorite)
-    }
-
-    private fun changeLickedButtonStyle(isFavorite: Boolean) {
-        state.value = state.value?.copy(isTrackLicked = isFavorite)
-    }
-
-    fun onPause() {
-        pausePlayer()
+    fun removeAudioPlayerControl() {
+        audioPlayerControl = null
     }
 
     override fun onCleared() {
         super.onCleared()
-        releasePlayer()
+        audioPlayerControl?.safeReleasePlayer()
+        audioPlayerControl = null
     }
 
     fun playbackControl() {
-        when (state.value?.state) {
-            STATE_PLAYING -> pausePlayer()
-            STATE_PREPARED, STATE_PAUSED -> startPlayer()
-            STATE_DEFAULT -> {
+        val currentState = playerState.value
+        when (currentState) {
+            is PlayerState.Playing -> audioPlayerControl?.pausePlayer()
+            is PlayerState.Prepared, is PlayerState.Paused -> audioPlayerControl?.startPlayer()
+            else -> {
                 viewModelScope.launch {
-                    startPlayer()
+                    audioPlayerControl?.startPlayer()
                 }
             }
         }
     }
 
-    private suspend fun preparePlayer() {
-        player.reset()
-        player.prepare(track.previewUrl)
-        player.getMediaPlayer().setOnPreparedListener {
-            isPlayerInitialized = true
-            state.value = state.value?.copy(
-                track = track,
-                isPlayButtonEnabled = true
-            )
-            renderState(STATE_PREPARED)
-        }
-        player.getMediaPlayer().setOnCompletionListener {
-            timerJob?.cancel()
-            renderState(STATE_PREPARED)
-            state.value = state.value?.copy(timer = player.resetTimer())
-        }
-        checkIfTrackIsFavorite()
+    fun setAppInBackground() {
+        audioPlayerControl?.setAppInBackground()
     }
 
-    private fun startPlayer() {
-        player.play()
-        renderState(STATE_PLAYING)
-        startTimerUpdate()
-    }
-
-    private fun pausePlayer() {
-        player.pause()
-        timerJob?.cancel()
-        renderState(STATE_PAUSED)
-    }
-
-    private fun releasePlayer() {
-        player.stop()
-        player.release()
-        isPlayerInitialized = false
-        state.value = state.value?.copy(timer = player.resetTimer())
-        renderState(STATE_DEFAULT)
-    }
-
-    private fun startTimerUpdate() {
-        timerJob?.cancel()
-        timerJob = viewModelScope.launch {
-            while (state.value?.state == STATE_PLAYING) {
-                delay(REFRESH_SECONDS_VALUE_MILLIS)
-                state.value = state.value?.copy(timer = player.getCurrentPosition())
-            }
-        }
-    }
-
-    private fun renderState(state: Int) {
-        this.state.value = this.state.value?.copy(state = state)
+    fun setAppInForeground() {
+        audioPlayerControl?.setAppInForeground()
     }
 
     private val stateLiveData = MutableLiveData<PlaylistsState>()
@@ -183,31 +79,28 @@ class AudioPlayerViewModel(
 
     fun onTrackAddToPlaylist(playlist: Playlist) {
         viewModelScope.launch {
-            val result = playlistsInteractor.addTrackToPlaylist(track, playlist)
+            val result = audioPlayerControl?.addTrackToPlaylist(playlist)
             var message: String?
             val shouldHideBottomSheet: Boolean
-            if (result) {
+            if (result == true) {
                 message = "$trackAddMessage ${playlist.playlistName}"
                 shouldHideBottomSheet = true
             } else {
                 message = "$trackAddedMessage ${playlist.playlistName}"
                 shouldHideBottomSheet = false
             }
-
-            state.value = state.value?.copy(
-                addedTrackState = result,
-                message = message,
-                shouldHideBottomSheet = shouldHideBottomSheet
-            )
+            playerState.value =
+                playerState.value?.updateMessageState(result == true)?.resetMessage(message)
+                    ?.resetBottomSheetFlag(shouldHideBottomSheet)
         }
     }
 
     fun resetMessage() {
-        state.value = state.value?.copy(message = null)
+        playerState.value = playerState.value?.resetMessage(null)
     }
 
     fun resetBottomSheetFlag() {
-        state.value = state.value?.copy(shouldHideBottomSheet = false)
+        playerState.value = playerState.value?.resetBottomSheetFlag(false)
     }
 
     private fun processResult(playlists: List<Playlist>) {

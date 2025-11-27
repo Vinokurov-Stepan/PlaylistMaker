@@ -14,7 +14,7 @@ val viewModelModule = module {
     }
 
     viewModel { (trackAddMessage: String, trackAddedMessage: String) ->
-        AudioPlayerViewModel(get(), get(), get(), get(), trackAddMessage, trackAddedMessage)
+        AudioPlayerViewModel(get(), trackAddMessage, trackAddedMessage)
     }
 
     viewModel {
