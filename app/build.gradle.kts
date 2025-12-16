@@ -15,13 +15,13 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildFeatures {
         buildConfig = true
         viewBinding = true
+        compose = true
     }
 
     buildTypes {
@@ -45,6 +45,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.13"
+    }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -56,6 +60,10 @@ dependencies {
         kapt(libs.moxy.compiler)
         kapt(libs.room.compiler)
 
+        debugImplementation(libs.ui.tooling)
+        implementation(libs.ui)
+        implementation(libs.compose.material)
+        implementation(libs.activity.compose)
         implementation(platform(libs.firebase.bom))
         implementation(libs.peko)
         implementation(libs.room.runtime)

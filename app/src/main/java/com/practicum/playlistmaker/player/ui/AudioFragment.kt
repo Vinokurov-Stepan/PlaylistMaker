@@ -287,7 +287,6 @@ class AudioFragment : Fragment() {
         val stopIntent = Intent(requireContext(), MusicService::class.java)
         requireContext().stopService(stopIntent)
         val intent = Intent(requireContext(), MusicService::class.java)
-        ContextCompat.startForegroundService(requireContext(), intent)
         requireContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
 
