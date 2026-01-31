@@ -240,10 +240,12 @@ class PlaylistMakerFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.playlistStateLiveData().observe(viewLifecycleOwner) { state ->
-            render(state)
-            if (state is PlaylistsState.PlaylistContent) {
-                setupEditModeIfNeeded()
+        lifecycleScope.launch {
+            viewModel.playlistState.collect { state ->
+                render(state)
+                if (state is PlaylistsState.PlaylistContent) {
+                    setupEditModeIfNeeded()
+                }
             }
         }
     }

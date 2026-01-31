@@ -42,6 +42,7 @@ class RootActivity : AppCompatActivity() {
 
                 else -> {
                     binding.bottomNavigationView.isVisible = true
+                    binding.navMenuLine.isVisible = true
                 }
             }
         }

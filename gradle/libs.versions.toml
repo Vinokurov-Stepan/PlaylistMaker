@@ -11,6 +11,7 @@ material = "1.12.0"
 gson = "2.10.1"
 glide = "4.14.2"
 koin-android = "3.3.0"
+koin-androidx-compose = "3.3.0"
 appcompat = "1.7.1"
 activity = "1.8.2"
 constraintlayout = "2.2.1"
@@ -22,8 +23,23 @@ kotlin = "2.2.10"
 room_version = "2.7.2"
 peko = "3.0.5"
 firebase-bom = "34.4.0"
+navigation-compose = "2.7.7"
+ui-compose = "1.6.1"
+material-compose = "1.6.1"
+activity-compose = "1.8.2"
+material3-android = "1.4.0"
+camera-core = "1.5.2"
+coil-compose = "3.3.0"
+coil-network-okhttp = "3.3.0"
 
 [libraries]
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil-compose" }
+coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil-network-okhttp" }
+androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+ui-compose = { group = "androidx.compose.ui", name = "ui", version.ref = "ui-compose" }
+material-compose = { group = "androidx.compose.material", name = "material", version.ref = "material-compose" }
+activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
+navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
 peko = { group = "com.markodevcic", name = "peko", version.ref = "peko" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room_version" }
@@ -54,11 +70,15 @@ glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "gl
 glide-compiler = { group = "com.github.bumptech.glide", name = "compiler", version.ref = "glide" }
 
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin-android" }
+koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin-androidx-compose" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-junit" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
+androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3-android" }
+androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "camera-core" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

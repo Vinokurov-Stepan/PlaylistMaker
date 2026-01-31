@@ -1,13 +1,14 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
     id("kotlin-kapt")
     id("com.google.gms.google-services")
 }
 
 android {
     namespace = "com.practicum.playlistmaker"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.practicum.playlistmaker"
@@ -22,13 +23,15 @@ android {
     buildFeatures {
         buildConfig = true
         viewBinding = true
+        compose = true
     }
 
     buildTypes {
         release {
             isMinifyEnabled = true
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
             )
             buildConfigField("String", "SERVER_BASE_URL", "\"https://itunes.apple.com/\"")
             signingConfig = signingConfigs.getByName("debug")
@@ -45,6 +48,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.9"
+    }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -52,10 +59,19 @@ android {
 
 dependencies {
 
+    implementation(libs.androidx.material3.android)
+    implementation(libs.androidx.camera.core)
     dependencies {
         kapt(libs.moxy.compiler)
         kapt(libs.room.compiler)
 
+        implementation(libs.coil.compose)
+        implementation(libs.coil.network.okhttp)
+        implementation(libs.koin.androidx.compose)
+        implementation(libs.navigation.compose)
+        implementation(libs.ui.compose)
+        implementation(libs.material.compose)
+        implementation(libs.activity.compose)
         implementation(platform(libs.firebase.bom))
         implementation(libs.peko)
         implementation(libs.room.runtime)
@@ -79,6 +95,8 @@ dependencies {
         implementation(libs.gson)
         implementation(libs.glide)
         implementation(libs.koin.android)
+
+        debugImplementation(libs.androidx.ui.tooling)
 
         annotationProcessor(libs.glide.compiler)
 

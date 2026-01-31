@@ -4,8 +4,6 @@ import com.practicum.playlistmaker.core.domain.models.Playlist
 
 interface PlaylistsState {
 
-    data object Loading : PlaylistsState
-
     data class Content(
         val playlists: List<Playlist>
     ) : PlaylistsState

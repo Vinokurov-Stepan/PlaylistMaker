@@ -11,6 +11,9 @@ import com.practicum.playlistmaker.media.domain.api.PlaylistsInteractor
 import com.practicum.playlistmaker.media.presentation.PlaylistsState
 import com.practicum.playlistmaker.search.domain.api.SearchHistoryInteractor
 import com.practicum.playlistmaker.search.presentation.TracksState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class PlaylistsViewModel(
@@ -18,8 +21,9 @@ class PlaylistsViewModel(
     private val searchHistory: SearchHistoryInteractor,
 ) : ViewModel() {
 
-    private val _playlistStateLiveData = MutableLiveData<PlaylistsState>()
-    fun playlistStateLiveData(): LiveData<PlaylistsState> = _playlistStateLiveData
+    private val _playlistState =
+        MutableStateFlow<PlaylistsState>(PlaylistsState.Content(emptyList()))
+    val playlistState: StateFlow<PlaylistsState> = _playlistState.asStateFlow()
 
     private val _tracksStateLiveData = MutableLiveData<TracksState>()
     fun tracksStateLiveData(): LiveData<TracksState> = _tracksStateLiveData
@@ -33,17 +37,10 @@ class PlaylistsViewModel(
     private var currentTracks: List<Track> = emptyList()
 
     fun fillData() {
-        renderState(PlaylistsState.Loading)
         viewModelScope.launch {
             playlistsInteractor.getPlaylists().collect { playlists ->
                 processResult(playlists)
             }
-        }
-    }
-
-    fun onPlaylistCreate(playlist: Playlist, imageUri: Uri?) {
-        viewModelScope.launch {
-            playlistsInteractor.addPlaylist(playlist, imageUri)
         }
     }
 
@@ -52,6 +49,12 @@ class PlaylistsViewModel(
             renderState(PlaylistsState.Empty)
         } else {
             renderState(PlaylistsState.Content(playlists))
+        }
+    }
+
+    fun onPlaylistCreate(playlist: Playlist, imageUri: Uri?) {
+        viewModelScope.launch {
+            playlistsInteractor.addPlaylist(playlist, imageUri)
         }
     }
 
@@ -152,7 +155,7 @@ class PlaylistsViewModel(
     }
 
     private fun renderState(state: PlaylistsState) {
-        _playlistStateLiveData.postValue(state)
+        _playlistState.value = state
     }
 
     private fun renderState(state: TracksState) {

@@ -14,4 +14,12 @@ class DataMapperImpl(private val gson: Gson) : DataMapper {
             return gson.fromJson(json, Array<Track>::class.java)
         } else emptyList<Track>()).toTypedArray()
     }
+
+    override fun createJsonFromTrack(track: Track): String {
+        return gson.toJson(track)
+    }
+
+    override fun createTrackFromJson(json: String): Track {
+        return gson.fromJson(json, Track::class.java)
+    }
 }
