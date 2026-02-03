@@ -8,6 +8,9 @@ import com.practicum.playlistmaker.search.presentation.TracksState
 import com.practicum.playlistmaker.search.domain.api.SearchHistoryInteractor
 import com.practicum.playlistmaker.search.domain.api.TracksInteractor
 import com.practicum.playlistmaker.search.presentation.SearchUiState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,11 +27,11 @@ class SearchViewModel(
         private const val SEARCH_DEBOUNCE_DELAY = 2_000L
     }
 
-    private val _state = MutableStateFlow<TracksState>(TracksState.Content(emptyList()))
+    private val _state = MutableStateFlow<TracksState>(TracksState.Content(persistentListOf()))
     val state: StateFlow<TracksState> = _state.asStateFlow()
 
-    private val _historyState = MutableStateFlow<List<Track>>(searchHistory.loadTracks())
-    val historyState: StateFlow<List<Track>> = _historyState.asStateFlow()
+    private val _historyState = MutableStateFlow<ImmutableList<Track>>(persistentListOf())
+    val historyState: StateFlow<ImmutableList<Track>> = _historyState.asStateFlow()
 
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
@@ -55,7 +58,7 @@ class SearchViewModel(
     private fun performSearch(force: Boolean = false) {
         val searchText = _uiState.value.searchText
         if (searchText.isEmpty()) {
-            _state.value = TracksState.Content(emptyList())
+            _state.value = TracksState.Content(persistentListOf())
             lastSearchedText = null
             return
         }
@@ -78,10 +81,7 @@ class SearchViewModel(
         foundTracks: List<Track>?,
         errorMessage: String?
     ) {
-        val tracks = mutableListOf<Track>()
-        if (foundTracks != null) {
-            tracks.addAll(foundTracks)
-        }
+        val tracks = foundTracks?.toImmutableList() ?: persistentListOf()
         when {
             errorMessage != null -> {
                 renderState(
@@ -131,7 +131,7 @@ class SearchViewModel(
             showHistory = shouldShowHistory
         )
         if (text.isEmpty()) {
-            _state.value = TracksState.Content(emptyList())
+            _state.value = TracksState.Content(persistentListOf())
             lastSearchedText = null
         } else {
             searchDebounce(text)
@@ -162,13 +162,13 @@ class SearchViewModel(
             showHistory = _historyState.value.isNotEmpty()
         )
         lastSearchedText = null
-        renderState(TracksState.Content(emptyList()))
+        renderState(TracksState.Content(persistentListOf()))
     }
 
     fun onClearHistory() {
         viewModelScope.launch {
             searchHistory.clearHistory()
-            renderHistoryState(emptyList())
+            renderHistoryState(persistentListOf())
             _uiState.value = _uiState.value.copy(showHistory = false)
         }
     }
@@ -192,6 +192,6 @@ class SearchViewModel(
     }
 
     private fun renderHistoryState(historyTracks: List<Track>) {
-        _historyState.value = historyTracks
+        _historyState.value = historyTracks.toImmutableList()
     }
 }

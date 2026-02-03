@@ -62,6 +62,8 @@ import coil3.request.crossfade
 import com.practicum.playlistmaker.core.domain.models.Playlist
 import com.practicum.playlistmaker.media.presentation.PlaylistsState
 import com.practicum.playlistmaker.media.presentation.view_model.PlaylistsViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 class PlaylistsFragment : Fragment() {
 
@@ -130,7 +132,7 @@ fun PlaylistsScreen(
         when (playlistState) {
             is PlaylistsState.Content -> {
                 PlaylistsView(
-                    playlists = playlistState.playlists,
+                    playlists = playlistState.playlists.toImmutableList(),
                     onPlaylistClick = { playlist ->
                         tryPerformAction { onNavigateToPlaylistInfo(playlist) }
                     }
@@ -210,7 +212,7 @@ private fun PlaceholderView() {
 
 @Composable
 private fun PlaylistsView(
-    playlists: List<Playlist>,
+    playlists: ImmutableList<Playlist>,
     onPlaylistClick: (Playlist) -> Unit
 ) {
     LazyVerticalGrid(
@@ -424,7 +426,7 @@ private fun SearchScreenPreview() {
         CreatePlaylistButton {}
         if (isContented) {
             PlaylistsView(
-                playlists = playlists,
+                playlists = playlists.toImmutableList(),
                 onPlaylistClick = {}
             )
         }

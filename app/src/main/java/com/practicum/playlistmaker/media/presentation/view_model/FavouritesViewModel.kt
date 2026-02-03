@@ -6,6 +6,9 @@ import com.practicum.playlistmaker.core.domain.models.Track
 import com.practicum.playlistmaker.media.domain.api.FavouritesInteractor
 import com.practicum.playlistmaker.media.presentation.FavouritesState
 import com.practicum.playlistmaker.search.domain.api.SearchHistoryInteractor
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,13 +19,14 @@ class FavouritesViewModel(
     private val favouritesInteractor: FavouritesInteractor
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<FavouritesState>(FavouritesState.Content(emptyList()))
+    private val _state =
+        MutableStateFlow<FavouritesState>(FavouritesState.Content(persistentListOf()))
     val state: StateFlow<FavouritesState> = _state.asStateFlow()
 
     fun fillData() {
         viewModelScope.launch {
             favouritesInteractor.getTracks().collect { tracks ->
-                processResult(tracks)
+                processResult(tracks.toImmutableList())
             }
         }
     }
@@ -33,7 +37,7 @@ class FavouritesViewModel(
         }
     }
 
-    private fun processResult(tracks: List<Track>) {
+    private fun processResult(tracks: ImmutableList<Track>) {
         if (tracks.isEmpty()) {
             renderState(FavouritesState.Empty)
         } else {

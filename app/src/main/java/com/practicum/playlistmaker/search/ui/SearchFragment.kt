@@ -79,6 +79,8 @@ import com.practicum.playlistmaker.core.ui.root.RootActivity
 import com.practicum.playlistmaker.core.util.NetworkStateBroadcastReceiver
 import com.practicum.playlistmaker.search.presentation.TracksState
 import com.practicum.playlistmaker.search.presentation.view_model.SearchViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.collections.listOf
@@ -340,7 +342,7 @@ private fun SearchContent(
 
         is TracksState.Content -> {
             TracksListView(
-                tracks = state.tracks,
+                tracks = state.tracks.toImmutableList(),
                 onTrackClick = onTrackClick
             )
         }
@@ -383,7 +385,7 @@ private fun LoadingView() {
 
 @Composable
 private fun TracksListView(
-    tracks: List<Track>,
+    tracks: ImmutableList<Track>,
     onTrackClick: ((Track, Boolean) -> Unit)?
 ) {
     LazyColumn(
@@ -550,7 +552,7 @@ private fun PlaceholderView(
 
 @Composable
 private fun HistoryContent(
-    tracks: List<Track>,
+    tracks: ImmutableList<Track>,
     onClearHistoryClick: () -> Unit,
     onTrackClick: ((Track, Boolean) -> Unit)?
 ) {
@@ -702,10 +704,10 @@ private fun SearchScreenPreview() {
             LoadingView()
         }
         if (isContented) {
-            TracksListView(tracks, null)
+            TracksListView(tracks.toImmutableList(), null)
         }
         if (isHistoryContented) {
-            HistoryContent(tracks, onClearHistoryClick = {}, null)
+            HistoryContent(tracks.toImmutableList(), onClearHistoryClick = {}, null)
         }
         if (isEmpty) {
             PlaceholderView(

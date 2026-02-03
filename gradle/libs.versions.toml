@@ -31,8 +31,10 @@ material3-android = "1.4.0"
 camera-core = "1.5.2"
 coil-compose = "3.3.0"
 coil-network-okhttp = "3.3.0"
+kotlinx-collections-immutable = "0.4.0"
 
 [libraries]
+kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil-compose" }
 coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil-network-okhttp" }
 androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }

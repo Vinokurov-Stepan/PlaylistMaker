@@ -65,6 +65,7 @@ dependencies {
         kapt(libs.moxy.compiler)
         kapt(libs.room.compiler)
 
+        implementation(libs.kotlinx.collections.immutable)
         implementation(libs.coil.compose)
         implementation(libs.coil.network.okhttp)
         implementation(libs.koin.androidx.compose)

@@ -59,6 +59,8 @@ import coil3.compose.AsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 class FavouritesFragment : Fragment() {
 
@@ -169,7 +171,7 @@ private fun PlaceholderView() {
 
 @Composable
 private fun TracksListView(
-    tracks: List<Track>,
+    tracks: ImmutableList<Track>,
     onTrackClick: (Track) -> Unit
 ) {
     LazyColumn(
@@ -351,7 +353,7 @@ private fun FavouritesScreenPreview() {
         modifier = Modifier.fillMaxWidth()
     ) {
         if (isContented) {
-            TracksListView(tracks, onTrackClick = {})
+            TracksListView(tracks.toImmutableList(), onTrackClick = {})
         }
         if (isEmpty) {
             PlaceholderView()
