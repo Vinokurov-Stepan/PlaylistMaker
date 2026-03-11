@@ -16,7 +16,6 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -49,7 +48,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.9"
+        kotlinCompilerExtensionVersion = "1.5.13"
     }
 
     kotlinOptions {
@@ -65,13 +64,9 @@ dependencies {
         kapt(libs.moxy.compiler)
         kapt(libs.room.compiler)
 
-        implementation(libs.kotlinx.collections.immutable)
-        implementation(libs.coil.compose)
-        implementation(libs.coil.network.okhttp)
-        implementation(libs.koin.androidx.compose)
-        implementation(libs.navigation.compose)
-        implementation(libs.ui.compose)
-        implementation(libs.material.compose)
+        debugImplementation(libs.ui.tooling)
+        implementation(libs.ui)
+        implementation(libs.compose.material)
         implementation(libs.activity.compose)
         implementation(platform(libs.firebase.bom))
         implementation(libs.peko)

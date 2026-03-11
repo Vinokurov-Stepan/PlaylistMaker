@@ -1,47 +1,37 @@
 [versions]
-coroutines = "1.6.4"
-navigation = "2.5.3"
-fragment = "1.5.6"
+coroutines = "1.8.0"
+navigation = "2.7.7"
+fragment = "1.6.2"
 moxy = "2.2.2"
 core-ktx = "1.12.0"
 viewpager2 = "1.0.0"
-viewbinding = "8.10.1"
+viewbinding = "8.4.0"
 retrofit = "2.9.0"
-material = "1.12.0"
+material = "1.11.0"
 gson = "2.10.1"
-glide = "4.14.2"
-koin-android = "3.3.0"
-koin-androidx-compose = "3.3.0"
-appcompat = "1.7.1"
+glide = "4.16.0"
+koin-android = "3.5.0"
+appcompat = "1.6.1"
 activity = "1.8.2"
-constraintlayout = "2.2.1"
+constraintlayout = "2.1.4"
 junit = "4.13.2"
-androidx-junit = "1.2.1"
-espresso-core = "3.6.1"
-agp = "8.11.1"
-kotlin = "2.2.10"
-room_version = "2.7.2"
+androidx-junit = "1.1.5"
+espresso-core = "3.5.1"
 peko = "3.0.5"
-firebase-bom = "34.4.0"
-navigation-compose = "2.7.7"
-ui-compose = "1.6.1"
-material-compose = "1.6.1"
+firebase-bom = "32.8.0"
+kotlin = "1.9.23"
+room_version = "2.6.1"
+agp = "8.2.2"
+ui = "1.6.1"
+compose-material = "1.6.1"
 activity-compose = "1.8.2"
-material3-android = "1.4.0"
-camera-core = "1.5.2"
-coil-compose = "3.3.0"
-coil-network-okhttp = "3.3.0"
-kotlinx-collections-immutable = "0.4.0"
+ui-tooling = "1.6.2"
 
 [libraries]
-kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }
-coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil-compose" }
-coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil-network-okhttp" }
-androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
-ui-compose = { group = "androidx.compose.ui", name = "ui", version.ref = "ui-compose" }
-material-compose = { group = "androidx.compose.material", name = "material", version.ref = "material-compose" }
+ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "ui-tooling" }
+ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
+compose-material = { group = "androidx.compose.material", name = "material", version.ref = "compose-material" }
 activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
 peko = { group = "com.markodevcic", name = "peko", version.ref = "peko" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room_version" }
