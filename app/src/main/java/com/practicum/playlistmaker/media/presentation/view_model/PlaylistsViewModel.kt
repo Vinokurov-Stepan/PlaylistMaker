@@ -11,6 +11,12 @@ import com.practicum.playlistmaker.media.domain.api.PlaylistsInteractor
 import com.practicum.playlistmaker.media.presentation.PlaylistsState
 import com.practicum.playlistmaker.search.domain.api.SearchHistoryInteractor
 import com.practicum.playlistmaker.search.presentation.TracksState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class PlaylistsViewModel(
@@ -18,8 +24,9 @@ class PlaylistsViewModel(
     private val searchHistory: SearchHistoryInteractor,
 ) : ViewModel() {
 
-    private val _playlistStateLiveData = MutableLiveData<PlaylistsState>()
-    fun playlistStateLiveData(): LiveData<PlaylistsState> = _playlistStateLiveData
+    private val _playlistState =
+        MutableStateFlow<PlaylistsState>(PlaylistsState.Content(persistentListOf()))
+    val playlistState: StateFlow<PlaylistsState> = _playlistState.asStateFlow()
 
     private val _tracksStateLiveData = MutableLiveData<TracksState>()
     fun tracksStateLiveData(): LiveData<TracksState> = _tracksStateLiveData
@@ -30,28 +37,27 @@ class PlaylistsViewModel(
     private val _playlistTracksCount = MutableLiveData<Int>()
     val playlistTracksCount: LiveData<Int> = _playlistTracksCount
 
-    private var currentTracks: List<Track> = emptyList()
+    private var currentTracks: ImmutableList<Track> = persistentListOf()
 
     fun fillData() {
-        renderState(PlaylistsState.Loading)
         viewModelScope.launch {
             playlistsInteractor.getPlaylists().collect { playlists ->
-                processResult(playlists)
+                processResult(playlists.toImmutableList())
             }
+        }
+    }
+
+    private fun processResult(playlists: ImmutableList<Playlist>) {
+        if (playlists.isEmpty()) {
+            renderState(PlaylistsState.Empty)
+        } else {
+            renderState(PlaylistsState.Content(playlists))
         }
     }
 
     fun onPlaylistCreate(playlist: Playlist, imageUri: Uri?) {
         viewModelScope.launch {
             playlistsInteractor.addPlaylist(playlist, imageUri)
-        }
-    }
-
-    private fun processResult(playlists: List<Playlist>) {
-        if (playlists.isEmpty()) {
-            renderState(PlaylistsState.Empty)
-        } else {
-            renderState(PlaylistsState.Content(playlists))
         }
     }
 
@@ -63,7 +69,7 @@ class PlaylistsViewModel(
                 _playlistTracksCount.value = playlist.numberOfTracks
                 loadPlaylistTracks(playlistId)
                 playlistsInteractor.getTracksByPlaylistId(playlistId).collect { tracks ->
-                    renderState(TracksState.Content(tracks))
+                    renderState(TracksState.Content(tracks.toImmutableList()))
                 }
             }
         }
@@ -90,14 +96,14 @@ class PlaylistsViewModel(
 
     private fun updateUIAfterTrackDeletion(trackId: Int, playlistId: Int) {
         val updatedTracks = currentTracks.filter { it.trackId != trackId }
-        currentTracks = updatedTracks
-        renderState(TracksState.Content(updatedTracks))
+        currentTracks = updatedTracks.toImmutableList()
+        renderState(TracksState.Content(currentTracks))
         _playlistTracksCount.value = updatedTracks.size
-        calculateTotalDuration(updatedTracks)
+        calculateTotalDuration(currentTracks)
         viewModelScope.launch {
             playlistsInteractor.getTracksByPlaylistId(playlistId).collect { freshTracks ->
                 if (freshTracks.size != updatedTracks.size) {
-                    currentTracks = freshTracks
+                    currentTracks = freshTracks.toImmutableList()
                     renderState(TracksState.Content(currentTracks))
                     calculateTotalDuration(currentTracks)
                 }
@@ -108,14 +114,14 @@ class PlaylistsViewModel(
     private fun loadPlaylistTracks(playlistId: Int) {
         viewModelScope.launch {
             playlistsInteractor.getTracksByPlaylistId(playlistId).collect { tracks ->
-                currentTracks = tracks
-                renderState(TracksState.Content(tracks))
-                calculateTotalDuration(tracks)
+                currentTracks = tracks.toImmutableList()
+                renderState(TracksState.Content(currentTracks))
+                calculateTotalDuration(currentTracks)
             }
         }
     }
 
-    private fun calculateTotalDuration(tracks: List<Track>) {
+    private fun calculateTotalDuration(tracks: ImmutableList<Track>) {
         val totalMillis = tracks.sumOf { track ->
             parseTimeToMillis(track.trackTimeMillis)
         }
@@ -152,7 +158,7 @@ class PlaylistsViewModel(
     }
 
     private fun renderState(state: PlaylistsState) {
-        _playlistStateLiveData.postValue(state)
+        _playlistState.value = state
     }
 
     private fun renderState(state: TracksState) {

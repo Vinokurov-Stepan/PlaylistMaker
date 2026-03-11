@@ -27,6 +27,7 @@ import com.practicum.playlistmaker.media.presentation.PlaylistsState
 import com.practicum.playlistmaker.media.presentation.view_model.PlaylistsViewModel
 import com.practicum.playlistmaker.search.presentation.TracksState
 import com.practicum.playlistmaker.search.ui.TrackListAdapter
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 class PlaylistInfoFragment : Fragment() {
@@ -178,8 +179,10 @@ class PlaylistInfoFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.playlistStateLiveData().observe(viewLifecycleOwner) { state ->
-            render(state)
+        lifecycleScope.launch {
+            viewModel.playlistState.collect { state ->
+                render(state)
+            }
         }
 
         viewModel.tracksStateLiveData().observe(viewLifecycleOwner) { state ->

@@ -35,7 +35,6 @@ class MusicService() : Service(), AudioPlayerControl {
     private val searchHistory: SearchHistoryInteractor by inject()
     private val favouritesInteractor: FavouritesInteractor by inject()
     private val playlistsInteractor: PlaylistsInteractor by inject()
-
     private val binder = MusicServiceBinder()
     private var musicServiceJob: Job? = null
     private var track: Track? = null
@@ -43,7 +42,6 @@ class MusicService() : Service(), AudioPlayerControl {
     private var isAppInBackground = false
     private var isOnAudioScreen = true
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-
     private val _servicePlayerState = MutableStateFlow<PlayerState>(PlayerState.Default())
     private val servicePlayerState = _servicePlayerState.asStateFlow()
 

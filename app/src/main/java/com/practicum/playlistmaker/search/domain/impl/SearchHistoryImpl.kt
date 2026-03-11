@@ -12,15 +12,17 @@ class SearchHistoryImpl(
 
     companion object {
         private const val TRACK_ID = "TRACK_ID"
+        private const val LISTENING_TRACK = "LISTENING_TRACK"
         private const val STORY_SIZE = 10
     }
 
-    override fun loadTracks(storyTracks: MutableList<Track>) {
+    override fun loadTracks(): MutableList<Track> {
+        val historyTracks = mutableListOf<Track>()
         val track = sharedPreferencesRepository.getStrItem(TRACK_ID)
         if (track != null) {
-            storyTracks.clear()
-            storyTracks.addAll(dataMapper.createTracksFromJson(track))
+            historyTracks.addAll(dataMapper.createTracksFromJson(track))
         }
+        return historyTracks
     }
 
     override fun addTrack(track: Track) {
@@ -42,16 +44,21 @@ class SearchHistoryImpl(
         )
     }
 
-    override fun clearHistory(storyTracks: MutableList<Track>) {
+    override fun clearHistory() {
         sharedPreferencesRepository.removeItem(TRACK_ID)
-        storyTracks.clear()
+    }
+
+    override fun setListeningTrack(track: Track) {
+        val trackJson = dataMapper.createJsonFromTrack(track)
+        sharedPreferencesRepository.putStrItem(LISTENING_TRACK, trackJson)
     }
 
     override fun getListeningTrack(): Track? {
-        val trackStr = sharedPreferencesRepository.getStrItem(TRACK_ID)
-        if (trackStr != null) {
-            val tracks = dataMapper.createTracksFromJson(trackStr)
-            return tracks[0]
-        } else return null
+        val trackJson = sharedPreferencesRepository.getStrItem(LISTENING_TRACK)
+        return if (trackJson.isNullOrEmpty()) {
+            null
+        } else {
+            dataMapper.createTrackFromJson(trackJson)
+        }
     }
 }

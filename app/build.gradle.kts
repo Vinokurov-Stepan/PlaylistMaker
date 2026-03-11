@@ -1,13 +1,14 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
     id("kotlin-kapt")
     id("com.google.gms.google-services")
 }
 
 android {
     namespace = "com.practicum.playlistmaker"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.practicum.playlistmaker"
@@ -28,7 +29,8 @@ android {
         release {
             isMinifyEnabled = true
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
             )
             buildConfigField("String", "SERVER_BASE_URL", "\"https://itunes.apple.com/\"")
             signingConfig = signingConfigs.getByName("debug")
@@ -56,6 +58,8 @@ android {
 
 dependencies {
 
+    implementation(libs.androidx.material3.android)
+    implementation(libs.androidx.camera.core)
     dependencies {
         kapt(libs.moxy.compiler)
         kapt(libs.room.compiler)
@@ -87,6 +91,8 @@ dependencies {
         implementation(libs.gson)
         implementation(libs.glide)
         implementation(libs.koin.android)
+
+        debugImplementation(libs.androidx.ui.tooling)
 
         annotationProcessor(libs.glide.compiler)
 

@@ -10,7 +10,7 @@ import org.koin.dsl.module
 
 val viewModelModule = module {
     viewModel { (errorStr: String, emptyStr: String) ->
-        SearchViewModel(get(), get(), get(), errorStr, emptyStr)
+        SearchViewModel(get(), get(), errorStr, emptyStr)
     }
 
     viewModel { (trackAddMessage: String, trackAddedMessage: String) ->

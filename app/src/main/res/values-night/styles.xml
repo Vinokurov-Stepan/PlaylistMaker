@@ -66,7 +66,7 @@
         <item name="cornerRadius">@dimen/_0dp</item>
         <item name="trackTint">@drawable/selector_switch_tracktint</item>
         <item name="thumbTint">@drawable/selector_switch_thumb</item>
-        <item name="android:checked">false</item>
+        <item name="android:checked">true</item>
     </style>
 
     <style name="SearchEditText">
