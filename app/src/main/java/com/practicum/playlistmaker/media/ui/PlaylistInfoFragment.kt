@@ -168,7 +168,7 @@ class PlaylistInfoFragment : Fragment() {
         }
 
         tracksAdapter = TrackListAdapter(tracks, onTrackClick = { track ->
-            (activity as RootActivity).animateBottomNavigationView()
+            (activity as RootActivity).animateBottomNavigationView(false)
             onTrackClickDebounce(track)
         }, onTrackLongClick = { track ->
             showDeleteTrackDialog(track)

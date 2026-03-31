@@ -12,5 +12,6 @@
     <color name="light_blue">#9FBBF3</color>
     <color name="grey">#E6E8EB</color>
     <color name="light_grey">#AEAFB4</color>
+    <color name="red">#F56B6C</color>
     <color name="bottom_sheet_background">#99000000</color>
 </resources>

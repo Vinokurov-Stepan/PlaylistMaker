@@ -10,7 +10,7 @@ import com.practicum.playlistmaker.media.data.entity.PlaylistEntity
 import com.practicum.playlistmaker.media.data.entity.TrackEntity
 
 @Database(
-    version = 11, entities = [TrackEntity::class, PlaylistEntity::class, AddedTrackEntity::class]
+    version = 1, entities = [TrackEntity::class, PlaylistEntity::class, AddedTrackEntity::class]
 )
 abstract class AppDatabase : RoomDatabase() {
 
