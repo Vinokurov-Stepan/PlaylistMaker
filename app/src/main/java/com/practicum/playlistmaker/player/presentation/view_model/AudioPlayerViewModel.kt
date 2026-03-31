@@ -1,7 +1,5 @@
 package com.practicum.playlistmaker.player.presentation.view_model
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.core.domain.models.Playlist
@@ -9,24 +7,28 @@ import com.practicum.playlistmaker.media.domain.api.PlaylistsInteractor
 import com.practicum.playlistmaker.media.presentation.PlaylistsState
 import com.practicum.playlistmaker.player.presentation.service.AudioPlayerControl
 import com.practicum.playlistmaker.player.presentation.service.PlayerState
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class AudioPlayerViewModel(
-    private val playlistsInteractor: PlaylistsInteractor,
+open class AudioPlayerViewModel(
+    private val playlistsInteractor: PlaylistsInteractor?,
     private val trackAddMessage: String,
     private val trackAddedMessage: String
 ) : ViewModel() {
 
     private var audioPlayerControl: AudioPlayerControl? = null
 
-    private val playerState = MutableLiveData<PlayerState>(PlayerState.Default())
-    fun observePlayerState(): LiveData<PlayerState> = playerState
+    private val _playerState = MutableStateFlow<PlayerState>(PlayerState.Default())
+    open val playerState: StateFlow<PlayerState> = _playerState.asStateFlow()
 
     fun setAudioPlayerControl(audioPlayerControl: AudioPlayerControl) {
         this.audioPlayerControl = audioPlayerControl
         viewModelScope.launch {
             audioPlayerControl.getPlayerState().collect {
-                playerState.postValue(it)
+                _playerState.value = it
             }
         }
     }
@@ -46,7 +48,7 @@ class AudioPlayerViewModel(
     }
 
     fun playbackControl() {
-        val currentState = playerState.value
+        val currentState = _playerState.value
         when (currentState) {
             is PlayerState.Playing -> audioPlayerControl?.pausePlayer()
             is PlayerState.Prepared, is PlayerState.Paused -> audioPlayerControl?.startPlayer()
@@ -66,12 +68,13 @@ class AudioPlayerViewModel(
         audioPlayerControl?.setAppInForeground()
     }
 
-    private val stateLiveData = MutableLiveData<PlaylistsState>()
-    fun observeState(): LiveData<PlaylistsState> = stateLiveData
+    private val _playlistState =
+        MutableStateFlow<PlaylistsState>(PlaylistsState.Content(persistentListOf()))
+    open val playlistState: StateFlow<PlaylistsState> = _playlistState.asStateFlow()
 
     fun fillData() {
         viewModelScope.launch {
-            playlistsInteractor.getPlaylists().collect { playlists ->
+            playlistsInteractor!!.getPlaylists().collect { playlists ->
                 processResult(playlists)
             }
         }
@@ -89,18 +92,20 @@ class AudioPlayerViewModel(
                 message = "$trackAddedMessage ${playlist.playlistName}"
                 shouldHideBottomSheet = false
             }
-            playerState.value =
-                playerState.value?.updateMessageState(result == true)?.resetMessage(message)
-                    ?.resetBottomSheetFlag(shouldHideBottomSheet)
+            _playerState.value =
+                _playerState.value
+                    .updateMessageState(result == true)
+                    .resetMessage(message)
+                    .resetBottomSheetFlag(shouldHideBottomSheet)
         }
     }
 
     fun resetMessage() {
-        playerState.value = playerState.value?.resetMessage(null)
+        _playerState.value = _playerState.value.resetMessage(null)
     }
 
     fun resetBottomSheetFlag() {
-        playerState.value = playerState.value?.resetBottomSheetFlag(false)
+        _playerState.value = _playerState.value.resetBottomSheetFlag(false)
     }
 
     private fun processResult(playlists: List<Playlist>) {
@@ -112,6 +117,6 @@ class AudioPlayerViewModel(
     }
 
     private fun renderState(state: PlaylistsState) {
-        stateLiveData.postValue(state)
+        _playlistState.value = state
     }
 }

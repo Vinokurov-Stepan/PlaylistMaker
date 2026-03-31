@@ -3,14 +3,14 @@ coroutines = "1.8.0"
 navigation = "2.7.7"
 fragment = "1.6.2"
 moxy = "2.2.2"
-core-ktx = "1.12.0"
+core-ktx = "1.13.1"
 viewpager2 = "1.0.0"
 viewbinding = "8.4.0"
 retrofit = "2.9.0"
 material = "1.11.0"
 gson = "2.10.1"
 glide = "4.16.0"
-koin-android = "3.5.0"
+koin-android = "4.1.1"
 appcompat = "1.6.1"
 activity = "1.8.2"
 constraintlayout = "2.1.4"
@@ -19,13 +19,18 @@ androidx-junit = "1.1.5"
 espresso-core = "3.5.1"
 peko = "3.0.5"
 firebase-bom = "32.8.0"
-kotlin = "1.9.23"
-room_version = "2.6.1"
-agp = "8.2.2"
+kotlin = "2.0.21"
+room_version = "2.8.4"
+agp = "8.9.1"
 ui = "1.6.1"
 compose-material = "1.6.1"
-activity-compose = "1.8.2"
+activity-compose = "1.9.3"
 ui-tooling = "1.6.2"
+material3-android = "1.4.0"
+camerax_version = "1.7.0-alpha01"
+koin-androidx-compose = "4.1.1"
+kotlinxCollectionsImmutable = "0.4.0"
+coilCompose = "2.7.0"
 
 [libraries]
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "ui-tooling" }
@@ -46,6 +51,8 @@ androidx-viewbinding = { group = "androidx.databinding", name = "viewbinding", v
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-activity = { group = "androidx.activity", name = "activity-ktx", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
+images-coilCompose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
@@ -68,7 +75,7 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-junit" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
 androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3-android" }
-androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "camera-core" }
+androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "camerax_version" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.practicum.playlistmaker"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.practicum.playlistmaker"
@@ -73,7 +73,6 @@ dependencies {
         implementation(libs.room.runtime)
         implementation(libs.room.ktx)
         implementation(libs.kotlinx.coroutines.android)
-        implementation(libs.kotlinx.coroutines.android)
         implementation(libs.navigation.fragment)
         implementation(libs.navigation.ui)
         implementation(libs.androidx.fragment.ktx)
@@ -91,8 +90,9 @@ dependencies {
         implementation(libs.gson)
         implementation(libs.glide)
         implementation(libs.koin.android)
-
-        debugImplementation(libs.androidx.ui.tooling)
+        implementation(libs.koin.androidx.compose)
+        implementation(libs.kotlinx.collections.immutable)
+        implementation(libs.images.coilCompose)
 
         annotationProcessor(libs.glide.compiler)
 

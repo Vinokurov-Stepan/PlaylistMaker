@@ -31,11 +31,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -69,10 +69,9 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import coil3.compose.AsyncImage
-import coil3.request.CachePolicy
-import coil3.request.ImageRequest
-import coil3.request.crossfade
+import coil.compose.AsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.core.domain.models.Track
 import com.practicum.playlistmaker.core.ui.root.RootActivity
@@ -83,17 +82,16 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import kotlin.collections.listOf
 
 class SearchFragment : Fragment() {
 
+    private val networkStateBroadcastReceiver = NetworkStateBroadcastReceiver()
     private lateinit var errorMessage: String
     private lateinit var emptyMessage: String
-    private val networkStateBroadcastReceiver = NetworkStateBroadcastReceiver()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         return ComposeView(requireContext()).apply {
             errorMessage = getString(R.string.something_went_wrong)
             emptyMessage = getString(R.string.nothing_found)
@@ -104,8 +102,8 @@ class SearchFragment : Fragment() {
                             errorMessage, emptyMessage
                         )
                     }),
-                    onNavigateToAudio = { track ->
-                        (activity as RootActivity).animateBottomNavigationView()
+                    onNavigateToAudio = {
+                        (activity as RootActivity).animateBottomNavigationView(false)
                         findNavController().navigate(
                             R.id.action_searchFragment_to_audioFragment
                         )
@@ -122,7 +120,7 @@ class SearchFragment : Fragment() {
             requireContext(),
             networkStateBroadcastReceiver,
             IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"),
-            ContextCompat.RECEIVER_NOT_EXPORTED,
+            ContextCompat.RECEIVER_NOT_EXPORTED
         )
     }
 
@@ -622,7 +620,7 @@ private fun HistoryContent(
 @Composable
 private fun SearchScreenPreview() {
     val isLoading = false
-    val isContented = false
+    val isContented = true
     val isHistoryContented = false
     val isEmpty = false
     val isError = false

@@ -39,7 +39,7 @@ class SettingsFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         return ComposeView(requireContext()).apply {
             setContent {
                 SettingsScreen(viewModel = koinViewModel())
@@ -174,22 +174,22 @@ private fun SettingsScreenPreview() {
         SettingsTitle()
         ThemeSwitch(
             isDarkTheme = false,
-            onThemeChanged = { null }
+            onThemeChanged = {}
         )
         SettingsButton(
             text = stringResource(R.string.share_app),
             iconRes = R.drawable.to_share,
-            onClick = { null }
+            onClick = {}
         )
         SettingsButton(
             text = stringResource(R.string.text_to_support),
             iconRes = R.drawable.to_support,
-            onClick = { null }
+            onClick = {}
         )
         SettingsButton(
             text = stringResource(R.string.user_agreement),
             iconRes = R.drawable.arrowforward,
-            onClick = { null }
+            onClick = {}
         )
     }
 }

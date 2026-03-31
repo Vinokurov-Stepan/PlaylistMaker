@@ -26,29 +26,33 @@ class RootActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.audioFragment -> {
-                    binding.bottomNavigationView.isVisible = false
-                    binding.navMenuLine.isVisible = false
+                    animateBottomNavigationView(false)
+                    animateNavMenuLine(false)
                 }
 
                 R.id.playlistMakerFragment -> {
-                    binding.bottomNavigationView.isVisible = false
-                    binding.navMenuLine.isVisible = false
+                    animateBottomNavigationView(false)
+                    animateNavMenuLine(false)
                 }
 
                 R.id.playlistInfoFragment -> {
-                    binding.bottomNavigationView.isVisible = false
-                    binding.navMenuLine.isVisible = false
+                    animateBottomNavigationView(false)
+                    animateNavMenuLine(false)
                 }
 
                 else -> {
-                    binding.bottomNavigationView.isVisible = true
-                    binding.navMenuLine.isVisible = true
+                    animateBottomNavigationView(true)
+                    animateNavMenuLine(true)
                 }
             }
         }
     }
 
-    fun animateBottomNavigationView() {
-        binding.bottomNavigationView.isVisible = false
+    fun animateBottomNavigationView(isVisible: Boolean) {
+        binding.bottomNavigationView.isVisible = isVisible
+    }
+
+    private fun animateNavMenuLine(isVisible: Boolean) {
+        binding.navMenuLine.isVisible = isVisible
     }
 }
