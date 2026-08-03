@@ -92,3 +92,8 @@ git checkout ui-old-view-xml
 
 Лицензия
 Этот проект создан в рамках учебного курса Яндекс.Практикума и предназначен для демонстрации навыков Android-разработки.
+
+Контакты
+GitHub: https://github.com/Vinokurov-Stepan
+Telegram: @Stepan_Vin
+Email: svv.vinokurov@mail.ru
